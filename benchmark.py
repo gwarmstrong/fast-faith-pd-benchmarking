@@ -204,7 +204,7 @@ def prepare_args(func_names, reps, otu_sizes=None, sample_sizes=None, directory=
     return all_arguments
 
 
-def experiment(table, tree, func_names, reps, otu_sizes=[10,100], sample_sizes=[12,24], directory=None, n_cpus=-1):
+def experiment(table, tree, func_names, reps, otu_sizes=None, sample_sizes=None, directory=None, n_cpus=-1):
     """
 
     Parameters
@@ -250,7 +250,7 @@ if __name__ == '__main__':
             node.length = 0
 
     print("Running experiment...")
-    results = experiment(bt, tree, functions.keys(), 2, directory='data/output/demo_exp', n_cpus=-1)
+    results = experiment(bt, tree, functions.keys(), otu_sizes=[10], sample_size=[12], 2, directory='data/output/demo_exp', n_cpus=-1)
     print("Done.")
 
     results.to_csv('data/output/demo_results.txt', sep='\t')
