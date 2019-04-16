@@ -11,6 +11,21 @@ import os
 import multiprocessing
 from functools import partial
 
+def _to_dense(vec):
+    """Converts a row/col vector to a dense numpy array.
+    Always returns a 1-D row vector for consistency with numpy iteration
+    over arrays.
+    """
+    dense_vec = np.asarray(vec.todense())
+
+    if vec.shape == (1, 1):
+        # Handle the special case where we only have a single element, but
+        # we don't want to return a numpy scalar / 0-d array. We still want
+        # to return a vector of length 1.
+        return dense_vec.reshape(1)
+    else:
+        return np.squeeze(dense_vec)
+
 def safe_dir(directory):
     if directory is not None:
         if not os.path.exists(directory):
@@ -115,13 +130,14 @@ def faith_core(table, tree, func_name, otu_size, sample_size, seed=None, results
 
 def prep_faith(table, tree, func_name, otu_size, sample_size, seed=None, results_file=None):
     table_subset = get_random_subtable(table, otu_size, sample_size, seed=seed)
-    counts = np.asarray([table_subset.data(i) for i in table_subset.ids()])
+    counts = [table_subset.data(i, dense=False) for i in table_subset.ids()]
     otu_ids = table_subset.ids('observation')
     sample_ids = table_subset.ids('sample')
     return counts, otu_ids, sample_ids, tree, func_name, seed, results_file
 
 def pool_faith(counts, otu_ids, sample_ids, tree, func_name, seed, results_file=None):
     func = functions[func_name]
+    counts = np.asarray([_to_dense(vec) for vec in counts]) 
     results = timeit(func, counts, otu_ids, tree)
     results['function'] = func_name
     results['seed'] = seed
@@ -188,7 +204,7 @@ def prepare_args(func_names, reps, otu_sizes=None, sample_sizes=None, directory=
     return all_arguments
 
 
-def experiment(table, tree, func_names, reps, otu_sizes=None, sample_sizes=None, directory=None, n_cpus=-1):
+def experiment(table, tree, func_names, reps, otu_sizes=[10,100], sample_sizes=[12,24], directory=None, n_cpus=-1):
     """
 
     Parameters
@@ -234,7 +250,7 @@ if __name__ == '__main__':
             node.length = 0
 
     print("Running experiment...")
-    results = experiment(bt, tree, functions.keys(), 2, directory='data/output/demo_exp', n_cpus=1)
+    results = experiment(bt, tree, functions.keys(), 2, directory='data/output/demo_exp', n_cpus=-1)
     print("Done.")
 
     results.to_csv('data/output/demo_results.txt', sep='\t')
