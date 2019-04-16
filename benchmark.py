@@ -255,21 +255,3 @@ if __name__ == '__main__':
 
     results.to_csv('data/output/demo_results.txt', sep='\t')
 
-#    print("Starting...")
-#    t0 = time.time()
-#    f1 = run_faith(counts, otu_ids, tree)
-#    t1 = time.time()
-#    print("Faith():          {}".format(t1-t0))
-#    t2 = time.time()
-#    f2 = run_fast_faith(counts, otu_ids, tree)
-#    t3 = time.time()
-#    print("FastFaith():      {}".format(t3 - t2))
-#    t4 = time.time()
-#    f3 = run_fast_faith_shear(counts, otu_ids, tree)
-#    t5 = time.time()
-#    print("FastFaithShear(): {}".format(t5 - t4))
-#    if np.allclose(f1.values, f2.values):
-#        print("Success!")
-#    else:
-#        print(":(")
-#
