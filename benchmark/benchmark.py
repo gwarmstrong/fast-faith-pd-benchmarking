@@ -47,6 +47,8 @@ def faith_core(table, tree, func_name, otu_size, sample_size, seed=None, results
     results['seed'] = seed
     results['otu_ids'] = list(otu_ids)
     results['sample_ids'] = list(sample_ids)
+    results['num_otus'] = len(otu_ids)
+    results['num_samples'] = len(otu_ids)
 
     if results_file is not None:
         # write results to file, then pop otu_ids and sample_ids from results to save on space
@@ -73,6 +75,8 @@ def pool_faith(counts, otu_ids, sample_ids, tree, func_name, seed, results_file=
     results['seed'] = seed
     results['otu_ids'] = list(otu_ids)
     results['sample_ids'] = list(sample_ids)
+    results['num_otus'] = len(otu_ids)
+    results['num_samples'] = len(otu_ids)
 
     if results_file is not None:
         # write results to file, then pop otu_ids and sample_ids from results to save on space
@@ -167,12 +171,13 @@ def experiment(table, tree, func_names, reps, otu_sizes=None, sample_sizes=None,
     results = apply_args(table, tree, args, n_cpus=n_cpus)
     return pd.DataFrame(results)
     
+# TODO: method that reads args from file and applies them (apply_args)
 
 if __name__ == '__main__':
 
-    tree = TreeNode.read('../data/gg_13_8_otus/trees/97_otus.tree')
+    tree = TreeNode.read('data/gg_13_8_otus/trees/97_otus.tree')
 
-    bt = load_table('../data/moving-pictures/67_otu_table.biom')
+    bt = load_table('data/moving-pictures/67_otu_table.biom')
 
     print("Adding zero branch lengths")
     for node in tree.traverse():
@@ -180,8 +185,15 @@ if __name__ == '__main__':
             node.length = 0
 
     print("Running experiment...")
-    results = experiment(bt, tree, functions.keys(), 2, otu_sizes=[10], sample_sizes=[12], directory='../data/output/demo_exp', n_cpus=-1)
+    results = experiment(bt,
+                         tree,
+                         functions.keys(),
+                         5,
+                         otu_sizes=[10, 100, 1000, 10000, 15000],
+                         sample_sizes=[1000],
+                         directory='data/output/demo_exp2',
+                         n_cpus=-1)
     print("Done.")
 
-    results.to_csv('../data/output/demo_results.txt', sep='\t')
+    results.to_csv('data/output/demo2_results.txt', sep='\t')
 
