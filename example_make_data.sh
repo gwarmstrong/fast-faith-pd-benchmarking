@@ -1,0 +1,1 @@
+python benchmark/make_data.py --tree ../trial-unifrac/moving-pictures-downloaded/tree-dir/tree.nwk --table ../trial-unifrac/moving-pictures-downloaded/table-dir/feature-table.biom --otu-sizes 10 20 30 --reps 10 --output-dir data/demo3

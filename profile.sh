@@ -1,10 +1,10 @@
 
-DATADIR="data/demo2"
-OUTPUTDIR="data/demo2_output"
+DATADIR="data/demo3"
+OUTPUTDIR="data/demo3_output"
 
 ARGS="$DATADIR/args.txt"
 
-JOB_NUM=3
+JOB_NUM=$1
 
 function getline { echo $(sed "$1 q;d" $ARGS); }
 

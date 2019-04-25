@@ -115,6 +115,21 @@ def generate_random_tables(table, tree, output_dir, otu_sizes=None, sample_sizes
                 node.length = 0
         tree_subset.write(full_file_start + '.newick')
 
+    # write out arguments to file
+    args_file = os.path.join(output_dir, 'args.txt')
+
+    with open(args_file, 'w') as fp:
+        for arg in args:
+            for item in arg:
+                fp.write(str(item) + '\n')
+            fp.write('\n')
 
     return output_dir
 
+if __name__ == '__main__':
+    from biom import load_table
+    from skbio import TreeNode
+    table = load_table('../../trial-unifrac/moving-pictures-downloaded/table-dir/feature-table.biom')
+    tree = TreeNode.read('../../trial-unifrac/moving-pictures-downloaded/tree-dir/tree.nwk')
+
+    generate_random_tables(table, tree, '../data/demo2', otu_sizes=[1,10], sample_sizes=[1,10], reps=3)
