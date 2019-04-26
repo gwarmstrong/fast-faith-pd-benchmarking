@@ -2,6 +2,7 @@ from table import generate_random_tables
 from biom import load_table
 from skbio import TreeNode
 import argparse
+import bp
 
 parser = argparse.ArgumentParser()
 
@@ -29,7 +30,8 @@ parser.add_argument('--job-id', '-j', dest='job_id',
 args = parser.parse_args()
 
 table = load_table(args.table)
-tree = TreeNode.read(args.tree)
+tree = bp.parse_newick(open(args.tree).read())
+#tree = TreeNode.read(args.tree)
 generate_random_tables(table, tree, args.output_dir, 
                        otu_sizes=args.otu_sizes,
                        sample_sizes=args.sample_sizes,

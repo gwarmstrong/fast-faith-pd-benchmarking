@@ -114,7 +114,7 @@ arg_names = ['otu_size', 'sample_size', 'rep', 'seed']
 
 def subset_and_write_table_tree(otu_size: int, sample_size: int, rep: int,
                                 seed: int, table: biom.Table,
-                                tree: skbio.TreeNode,
+                                tree: bp.BP,
                                 output_dir) -> None:
     """Given parameters for a single subset, filter the table and tree and
     write to file
@@ -139,7 +139,8 @@ def subset_and_write_table_tree(otu_size: int, sample_size: int, rep: int,
     # create a sheared tree based off the table
     otu_ids = table_subset.ids('observation')
 
-    bp_tree = bp.from_skbio_treenode(tree)
+    # TODO: change bp_tree to tree
+    bp_tree = tree # bp.from_skbio_treenode(tree)
 
     sheared_bp = bp_tree.shear(set(otu_ids))
 
