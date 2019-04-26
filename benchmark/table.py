@@ -85,14 +85,41 @@ def prep_args(otu_sizes=None, sample_sizes=None, reps=1):
     return sizes_with_seeds
 
 arg_names = ['otu_size', 'sample_size', 'rep', 'seed']
-def generate_random_tables(table, tree, output_dir, otu_sizes=None, sample_sizes=None, reps=1):
+def generate_random_tables(table, tree, output_dir, otu_sizes=None, sample_sizes=None, reps=1, job=None):
 
     # TODO use safe_dir to create output_dir if not created
     safe_dir(output_dir)
 
     args = prep_args(otu_sizes=otu_sizes, sample_sizes=sample_sizes, reps=reps)
 
-    for arg in args:
+    if job is None:  
+            for arg in args:
+                # TODO this below should be made into a function
+                # prepare output info
+                file_start = 'otu_size-{}--sample_size-{}--'\
+                             'rep-{}--seed-{}'.format(*arg)
+                full_file_start = os.path.join(output_dir, file_start)
+
+                # get subsetted table
+                table_subset = get_random_subtable(table, otu_size=arg[0],
+                                   sample_size=arg[1], seed=arg[3])
+                table_subset.table_id = file_start
+
+                # write out biom table
+                with biom_open(full_file_start + '.biom', 'w') as fp:
+                    table_subset.to_hdf5(fp, "subset: " + file_start)
+
+                # create a sheared tree based off the table
+                otu_ids = table_subset.ids('observation')
+                tree_subset = tree.shear(otu_ids)
+                for node in tree.traverse():
+                    if node.length is None:
+                        node.length = 0
+                tree_subset.write(full_file_start + '.newick')
+    
+    else:
+        arg = args[job-1]
+        # TODO this below should be made into a function
         # prepare output info
         file_start = 'otu_size-{}--sample_size-{}--'\
                      'rep-{}--seed-{}'.format(*arg)
@@ -115,14 +142,15 @@ def generate_random_tables(table, tree, output_dir, otu_sizes=None, sample_sizes
                 node.length = 0
         tree_subset.write(full_file_start + '.newick')
 
-    # write out arguments to file
-    args_file = os.path.join(output_dir, 'args.txt')
+    if (job==1) or (job is None):
+            # write out arguments to file
+            args_file = os.path.join(output_dir, 'args.txt')
 
-    with open(args_file, 'w') as fp:
-        for arg in args:
-            for item in arg:
-                fp.write(str(item) + '\n')
-            fp.write('\n')
+            with open(args_file, 'w') as fp:
+                for arg in args:
+                    for item in arg:
+                        fp.write(str(item) + '\n')
+                    fp.write('\n')
 
     return output_dir
 

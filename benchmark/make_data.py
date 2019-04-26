@@ -22,6 +22,9 @@ parser.add_argument('--reps', '-r', dest='reps', default=1,
                     help='Number of times to sample each')
 parser.add_argument('--output-dir', '-d', dest='output_dir',
                     help="directory to write results to")
+parser.add_argument('--job-id', '-j', dest='job_id',
+                    type=int, default=None,
+                    help="job number for job array") 
 
 args = parser.parse_args()
 
@@ -30,7 +33,8 @@ tree = TreeNode.read(args.tree)
 generate_random_tables(table, tree, args.output_dir, 
                        otu_sizes=args.otu_sizes,
                        sample_sizes=args.sample_sizes,
-                       reps=args.reps)
+                       reps=args.reps,
+                       job=args.job_id)
 
 # '../../trial-unifrac/moving-pictures-downloaded/table-dir/feature-table.biom'
 # '../../trial-unifrac/moving-pictures-downloaded/tree-dir/tree.nwk'
