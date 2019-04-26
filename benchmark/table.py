@@ -3,6 +3,7 @@ import os
 from numpy import random
 from util import temporary_seed, safe_dir
 from biom.util import biom_open
+import bp
 
 def random_subset(table, otu_size=None, sample_size=None, seed=None):
     otu_ids = table.ids(axis='observation')
@@ -111,8 +112,15 @@ def generate_random_tables(table, tree, output_dir, otu_sizes=None, sample_sizes
 
                 # create a sheared tree based off the table
                 otu_ids = table_subset.ids('observation')
-                tree_subset = tree.shear(otu_ids)
-                for node in tree.traverse():
+                
+                bp_tree = bp.from_skbio_treenode(tree)
+
+                sheared_bp = bp_tree.shear(set(otu_ids))
+                
+                tree_subset = bp.to_skbio_treenode(sheared_bp)
+                
+                #tree_subset = tree.shear(otu_ids)
+                for node in tree_subset.traverse():
                     if node.length is None:
                         node.length = 0
                 tree_subset.write(full_file_start + '.newick')
@@ -136,8 +144,15 @@ def generate_random_tables(table, tree, output_dir, otu_sizes=None, sample_sizes
 
         # create a sheared tree based off the table
         otu_ids = table_subset.ids('observation')
-        tree_subset = tree.shear(otu_ids)
-        for node in tree.traverse():
+
+        bp_tree = bp.from_skbio_treenode(tree)
+
+        sheared_bp = bp_tree.shear(set(otu_ids))
+        
+        tree_subset = bp.to_skbio_treenode(sheared_bp)
+        
+        #tree_subset = tree.shear(otu_ids)
+        for node in tree_subset.traverse():
             if node.length is None:
                 node.length = 0
         tree_subset.write(full_file_start + '.newick')
