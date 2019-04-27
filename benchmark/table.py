@@ -164,11 +164,11 @@ def generate_random_tables(table, tree, output_dir, otu_sizes=None,
 
     if job is None:  
             for arg in args:
-                subset_and_write_table_tree(arg, table, tree, output_dir)
+                subset_and_write_table_tree(*arg, table, tree, output_dir)
 
     else:
         arg = args[job-1]
-        subset_and_write_table_tree(arg, table, tree, output_dir)
+        subset_and_write_table_tree(*arg, table, tree, output_dir)
 
     return output_dir
 
