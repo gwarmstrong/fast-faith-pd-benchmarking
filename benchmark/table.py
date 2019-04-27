@@ -170,6 +170,15 @@ def generate_random_tables(table, tree, output_dir, otu_sizes=None,
         arg = args[job-1]
         subset_and_write_table_tree(*arg, table, tree, output_dir)
 
+    if (job == 1) or (job is None):
+        # write out arguments to file
+        args_file = os.path.join(output_dir, 'args.txt')
+        with open(args_file, 'w') as fp:
+            for arg in args:
+                for item in arg:
+                    fp.write(str(item) + '\n')
+                fp.write('\n')
+
     return output_dir
 
 
