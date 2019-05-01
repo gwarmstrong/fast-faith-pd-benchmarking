@@ -31,8 +31,8 @@ args = parser.parse_args()
 
 table = load_table(args.table)
 tree = bp.parse_newick(open(args.tree).read())
-#tree = TreeNode.read(args.tree)
-generate_random_tables(table, tree, args.output_dir, 
+
+generate_random_tables(table, tree, args.output_dir,
                        otu_sizes=args.otu_sizes,
                        sample_sizes=args.sample_sizes,
                        reps=args.reps,

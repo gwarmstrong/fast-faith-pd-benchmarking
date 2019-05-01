@@ -1,6 +1,7 @@
 import numpy as np
 import os
 
+
 def to_dense(vec):
     """Converts a row/col vector to a dense numpy array.
     Always returns a 1-D row vector for consistency with numpy iteration
@@ -16,13 +17,16 @@ def to_dense(vec):
     else:
         return np.squeeze(dense_vec)
 
+
 def safe_dir(directory):
+    """Creates a directory if it does not exists"""
     if directory is not None:
         if not os.path.exists(directory):
             os.makedirs(directory)
     else:
         directory = os.path.curdir
     return directory
+
 
 class temporary_seed:
     """

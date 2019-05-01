@@ -15,13 +15,24 @@ from table import get_random_subtable
 
 
 def run_faith(counts, otu_ids, tree):
-    return list(alpha_diversity('faith_pd', counts, tree=tree, otu_ids=otu_ids).values)
+    return list(alpha_diversity('faith_pd',
+                                counts,
+                                tree=tree,
+                                otu_ids=otu_ids).values)
 
 def run_fast_faith(counts, otu_ids, tree):
-    return list(alpha_diversity('fast_faith_pd', counts, tree=tree, otu_ids=otu_ids, shear=False).values)
+    return list(alpha_diversity('fast_faith_pd',
+                                counts,
+                                tree=tree,
+                                otu_ids=otu_ids,
+                                shear=False).values)
 
 def run_fast_faith_shear(counts, otu_ids, tree):
-    return list(alpha_diversity('fast_faith_pd', counts, tree=tree, otu_ids=otu_ids, shear=True).values)
+    return list(alpha_diversity('fast_faith_pd',
+                                counts,
+                                tree=tree,
+                                otu_ids=otu_ids,
+                                shear=True).values)
 
 functions = {'faith_pd': run_faith,
              'fast_faith': run_fast_faith,
@@ -36,7 +47,14 @@ def timeit(func, *args, **kwargs):
     data = {'time': tot_time, 'results': output}
     return data
 
-def faith_core(table, tree, func_name, otu_size, sample_size, seed=None, results_file=None):
+def faith_core(table,
+               tree,
+               func_name,
+               otu_size,
+               sample_size,
+               seed=None,
+               results_file=None):
+
     table_subset = get_random_subtable(table, otu_size, sample_size, seed=seed)
     counts = np.asarray([table_subset.data(i) for i in table_subset.ids()])
     otu_ids = table_subset.ids('observation')
@@ -51,7 +69,8 @@ def faith_core(table, tree, func_name, otu_size, sample_size, seed=None, results
     results['num_samples'] = len(otu_ids)
 
     if results_file is not None:
-        # write results to file, then pop otu_ids and sample_ids from results to save on space
+        # write results to file, then pop otu_ids and sample_ids from
+        # results to save on space
         with open(results_file, 'w') as fp:
             json.dump(results, fp)
 
@@ -60,14 +79,18 @@ def faith_core(table, tree, func_name, otu_size, sample_size, seed=None, results
 
     return results
 
-def prep_faith(table, tree, func_name, otu_size, sample_size, seed=None, results_file=None):
+
+def prep_faith(table, tree, func_name, otu_size, sample_size, seed=None,
+               results_file=None):
     table_subset = get_random_subtable(table, otu_size, sample_size, seed=seed)
     counts = [table_subset.data(i, dense=False) for i in table_subset.ids()]
     otu_ids = table_subset.ids('observation')
     sample_ids = table_subset.ids('sample')
     return counts, otu_ids, sample_ids, tree, func_name, seed, results_file
 
-def pool_faith(counts, otu_ids, sample_ids, tree, func_name, seed, results_file=None):
+
+def pool_faith(counts, otu_ids, sample_ids, tree, func_name, seed,
+               results_file=None):
     func = functions[func_name]
     counts = np.asarray([to_dense(vec) for vec in counts]) 
     results = timeit(func, counts, otu_ids, tree)
@@ -79,7 +102,8 @@ def pool_faith(counts, otu_ids, sample_ids, tree, func_name, seed, results_file=
     results['num_samples'] = len(otu_ids)
 
     if results_file is not None:
-        # write results to file, then pop otu_ids and sample_ids from results to save on space
+        # write results to file, then pop otu_ids and sample_ids from
+        # results to save on space
         with open(results_file, 'w') as fp:
             json.dump(results, fp)
 
@@ -88,8 +112,10 @@ def pool_faith(counts, otu_ids, sample_ids, tree, func_name, seed, results_file=
 
     return results
 
+
 def apply_faith_func(args):
     return pool_faith(*args)
+
 
 def apply_args(table, tree, args_list, n_cpus=False):
 
@@ -111,6 +137,7 @@ def apply_args(table, tree, args_list, n_cpus=False):
 
     return results
 
+
 def prepare_args(func_names, reps, otu_sizes=None, sample_sizes=None, directory=None):
     if otu_sizes is None:
         otu_sizes = [None]
@@ -125,20 +152,23 @@ def prepare_args(func_names, reps, otu_sizes=None, sample_sizes=None, directory=
 
     sizes_with_seeds = [(*size_reps[seed], seed) for seed in seeds]
 
-    all_args_but_file = [(func_name, *other_args) for func_name in func_names for other_args in sizes_with_seeds]
+    all_args_but_file = [(func_name, *other_args) for func_name in
+                         func_names for other_args in sizes_with_seeds]
 
-    
-    file_names = ['_'.join(str(arg) for arg in other_args) + '.json' for other_args in all_args_but_file]
+    file_names = ['_'.join(str(arg) for arg in other_args) + '.json' for
+                  other_args in all_args_but_file]
 
     dir_ = safe_dir(directory) 
     file_names = [os.path.join(dir_, name) for name in file_names]
 
-    all_arguments = [(*other_args, file_names[i]) for i, other_args in enumerate(all_args_but_file)]
+    all_arguments = [(*other_args, file_names[i]) for i, other_args in
+                     enumerate(all_args_but_file)]
     
     return all_arguments
 
 
-def experiment(table, tree, func_names, reps, otu_sizes=None, sample_sizes=None, directory=None, n_cpus=-1):
+def experiment(table, tree, func_names, reps, otu_sizes=None,
+               sample_sizes=None, directory=None, n_cpus=-1):
     """
 
     Parameters
